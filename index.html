@@ -88,32 +88,111 @@
     </main>
 
 
-    <div id="loginPanel" class="login-panel">
+<div id="loginPanel" class="login-panel">
 
-        <div class="login-box">
+    <div class="login-box">
 
-            <button class="close" onclick="closeLogin()">×</button>
+        <button class="close" onclick="closeLogin()">×</button>
+
+        <!-- LOGIN -->
+        <div id="loginForm">
 
             <p class="welcome">NEXUS ACCOUNT</p>
 
             <h2>ENTER THE <span>SPACE</span></h2>
 
-            <input type="email" placeholder="Email address">
+            <input
+                type="email"
+                id="loginEmail"
+                placeholder="Email address"
+                autocomplete="email"
+            >
 
-            <input type="password" placeholder="Password">
+            <input
+                type="password"
+                id="loginPassword"
+                placeholder="Password"
+                autocomplete="current-password"
+            >
 
-            <button class="primary login-button">
+            <button
+                class="primary login-button"
+                onclick="handleLogin()"
+            >
                 LOGIN
             </button>
 
             <p class="register">
                 Don't have an account?
-                <a href="#">Create one</a>
+                <a href="#" onclick="showSignup(); return false;">
+                    Create one
+                </a>
+            </p>
+
+        </div>
+
+
+        <!-- SIGN UP -->
+        <div id="signupForm" style="display:none;">
+
+            <p class="welcome">NEW USER</p>
+
+            <h2>CREATE <span>NEXUS</span></h2>
+
+            <input
+                type="text"
+                id="signupUsername"
+                placeholder="Username"
+                autocomplete="username"
+            >
+
+            <input
+                type="text"
+                id="signupDisplayName"
+                placeholder="Display name"
+                autocomplete="name"
+            >
+
+            <input
+                type="email"
+                id="signupEmail"
+                placeholder="Email address"
+                autocomplete="email"
+            >
+
+            <input
+                type="password"
+                id="signupPassword"
+                placeholder="Password"
+                autocomplete="new-password"
+            >
+
+            <input
+                type="password"
+                id="signupConfirmPassword"
+                placeholder="Confirm password"
+                autocomplete="new-password"
+            >
+
+            <button
+                class="primary login-button"
+                onclick="handleSignup()"
+            >
+                CREATE ACCOUNT
+            </button>
+
+            <p class="register">
+                Already have an account?
+                <a href="#" onclick="showLogin(); return false;">
+                    Login
+                </a>
             </p>
 
         </div>
 
     </div>
+
+</div>
 
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
