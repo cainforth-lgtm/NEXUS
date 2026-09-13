@@ -2,6 +2,24 @@
 // NEXUS SUPABASE
 // =====================================
 
+function openLogin() {
+    const panel = document.getElementById("loginPanel");
+
+    if (panel) {
+        panel.classList.add("active");
+    } else {
+        alert("Login panel not found.");
+    }
+}
+
+function closeLogin() {
+    const panel = document.getElementById("loginPanel");
+
+    if (panel) {
+        panel.classList.remove("active");
+    }
+}
+
 const SUPABASE_URL = "https://zgeswrhyhxgwcgcgnsti.supabase.co";
 const SUPABASE_KEY = "sb_publishable_GX9S4EVFF4Lf_BRMETV80g_oEavE6Up";
 
