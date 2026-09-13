@@ -56,33 +56,34 @@
         </section>
 
 
-        <section class="features">
+        
+<section class="features">
 
-            <div class="feature">
-                <div class="icon">✦</div>
-                <h3>TEXT VAULT</h3>
-                <p>Your synchronized notes.</p>
-            </div>
+    <div class="feature" onclick="openFeature('text')">
+        <div class="icon">✦</div>
+        <h3>TEXT VAULT</h3>
+        <p>Your synchronized notes.</p>
+    </div>
 
-            <div class="feature">
-                <div class="icon">◈</div>
-                <h3>PRIVATE CHAT</h3>
-                <p>Your private conversations.</p>
-            </div>
+    <div class="feature" onclick="openFeature('chat')">
+        <div class="icon">◈</div>
+        <h3>PRIVATE CHAT</h3>
+        <p>Your private conversations.</p>
+    </div>
 
-            <div class="feature">
-                <div class="icon">◇</div>
-                <h3>ANIME HUB</h3>
-                <p>Shared anime and manga collection.</p>
-            </div>
+    <div class="feature" onclick="openFeature('anime')">
+        <div class="icon">◇</div>
+        <h3>ANIME HUB</h3>
+        <p>Shared anime and manga collection.</p>
+    </div>
 
-            <div class="feature">
-                <div class="icon">⬡</div>
-                <h3>MEDIA LAB</h3>
-                <p>Your media conversion tools.</p>
-            </div>
+    <div class="feature" onclick="openFeature('media')">
+        <div class="icon">⬡</div>
+        <h3>MEDIA LAB</h3>
+        <p>Your media conversion tools.</p>
+    </div>
 
-        </section>
+</section>
 
     </main>
 
@@ -126,6 +127,26 @@
             await supabaseClient.auth.signOut();
 
             window.location.href = "index.html";
+
+        }
+
+        function openFeature(feature) {
+
+    if (feature === "text") {
+        window.location.href = "text-vault.html";
+    }
+
+    else if (feature === "chat") {
+        window.location.href = "private-chat.html";
+    }
+
+    else if (feature === "anime") {
+        window.location.href = "anime-hub.html";
+    }
+
+    else if (feature === "media") {
+        window.location.href = "media-lab.html";
+    }
 
         }
 
