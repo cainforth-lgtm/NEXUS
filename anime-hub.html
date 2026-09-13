@@ -1172,7 +1172,530 @@ h1 span{
     }
 
 }
+/* =====================================================
+   ADD SUGGESTION MODAL
+===================================================== */
 
+.modal-overlay{
+    position:fixed;
+    inset:0;
+    z-index:100;
+
+    display:none;
+    align-items:center;
+    justify-content:center;
+
+    padding:20px;
+
+    background:rgba(0,8,25,.72);
+
+    backdrop-filter:blur(12px);
+
+    animation:modalFade .25s ease;
+}
+
+.modal-overlay.active{
+    display:flex;
+}
+
+@keyframes modalFade{
+    from{
+        opacity:0;
+    }
+
+    to{
+        opacity:1;
+    }
+}
+
+
+.suggestion-modal{
+
+    width:min(620px,100%);
+
+    max-height:90vh;
+
+    overflow-y:auto;
+
+    padding:28px;
+
+    border:
+        1px solid
+        rgba(90,220,255,.38);
+
+    border-radius:25px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(5,43,91,.88),
+            rgba(2,20,55,.92)
+        );
+
+    backdrop-filter:blur(25px);
+
+    box-shadow:
+        0 0 60px
+        rgba(0,170,255,.22),
+
+        inset 0 0 35px
+        rgba(70,210,255,.04);
+
+    animation:
+        modalIn
+        .35s
+        cubic-bezier(.2,.8,.2,1);
+}
+
+
+@keyframes modalIn{
+
+    from{
+        opacity:0;
+        transform:
+            translateY(25px)
+            scale(.95);
+    }
+
+    to{
+        opacity:1;
+        transform:
+            translateY(0)
+            scale(1);
+    }
+
+}
+
+
+.modal-header{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    margin-bottom:24px;
+}
+
+
+.modal-header h2{
+
+    font-size:24px;
+
+    letter-spacing:.5px;
+
+    color:white;
+}
+
+
+.modal-header h2 span{
+    color:var(--cyan);
+}
+
+
+.close-modal{
+
+    width:36px;
+    height:36px;
+
+    border-radius:50%;
+
+    border:
+        1px solid
+        var(--line);
+
+    background:
+        rgba(50,150,220,.15);
+
+    color:white;
+
+    font-size:18px;
+
+    cursor:pointer;
+
+    transition:.25s;
+}
+
+
+.close-modal:hover{
+
+    transform:
+        rotate(90deg);
+
+    background:
+        rgba(255,80,110,.22);
+
+}
+
+
+.form-grid{
+
+    display:grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap:15px;
+}
+
+
+.form-group{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:7px;
+}
+
+
+.form-group.full{
+    grid-column:1/-1;
+}
+
+
+.form-group label{
+
+    font-size:11px;
+
+    letter-spacing:1px;
+
+    color:#9edcf1;
+
+    text-transform:uppercase;
+}
+
+
+.form-group input,
+.form-group select,
+.form-group textarea{
+
+    width:100%;
+
+    border:
+        1px solid
+        rgba(110,220,255,.24);
+
+    border-radius:13px;
+
+    padding:
+        12px
+        13px;
+
+    outline:none;
+
+    background:
+        rgba(0,25,60,.55);
+
+    color:white;
+
+    font-family:inherit;
+
+    transition:.25s;
+}
+
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus{
+
+    border-color:
+        rgba(70,220,255,.72);
+
+    box-shadow:
+        0 0 18px
+        rgba(0,190,255,.13);
+}
+
+
+.form-group select option{
+
+    background:#062c67;
+
+    color:white;
+}
+
+
+.form-group textarea{
+
+    min-height:105px;
+
+    resize:vertical;
+}
+
+
+/* IMAGE UPLOAD */
+
+.image-upload{
+
+    position:relative;
+
+    min-height:155px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    text-align:center;
+
+    padding:20px;
+
+    border:
+        1px dashed
+        rgba(100,220,255,.42);
+
+    border-radius:16px;
+
+    background:
+        rgba(0,30,70,.35);
+
+    cursor:pointer;
+
+    overflow:hidden;
+
+    transition:.3s;
+}
+
+
+.image-upload:hover{
+
+    border-color:
+        var(--cyan);
+
+    background:
+        rgba(15,120,210,.16);
+
+    box-shadow:
+        inset 0 0 25px
+        rgba(40,200,255,.06);
+}
+
+
+.image-upload input{
+
+    position:absolute;
+
+    inset:0;
+
+    opacity:0;
+
+    cursor:pointer;
+}
+
+
+.upload-content{
+
+    pointer-events:none;
+}
+
+
+.upload-icon{
+
+    font-size:32px;
+
+    color:var(--cyan);
+
+    margin-bottom:7px;
+}
+
+
+.upload-content strong{
+
+    display:block;
+
+    font-size:14px;
+}
+
+
+.upload-content small{
+
+    display:block;
+
+    margin-top:5px;
+
+    color:#82abc0;
+
+    font-size:11px;
+}
+
+
+.image-preview{
+
+    display:none;
+
+    position:absolute;
+
+    inset:0;
+
+    width:100%;
+
+    height:100%;
+
+    object-fit:cover;
+}
+
+
+.image-upload.has-image .upload-content{
+    display:none;
+}
+
+
+.image-upload.has-image .image-preview{
+    display:block;
+}
+
+
+/* RATING */
+
+.rating-input{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:5px;
+}
+
+
+.rating-input span{
+
+    font-size:23px;
+
+    color:#496a7d;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+
+.rating-input span.active,
+.rating-input span:hover{
+
+    color:#ffe07c;
+
+    text-shadow:
+        0 0 12px
+        rgba(255,220,100,.45);
+}
+
+
+#ratingValue{
+
+    margin-left:8px;
+
+    color:#bfefff;
+
+    font-size:12px;
+}
+
+
+/* BUTTONS */
+
+.modal-actions{
+
+    display:flex;
+
+    justify-content:flex-end;
+
+    gap:10px;
+
+    margin-top:22px;
+
+    padding-top:18px;
+
+    border-top:
+        1px solid
+        rgba(130,220,255,.12);
+}
+
+
+.modal-cancel{
+
+    border:
+        1px solid
+        rgba(130,220,255,.25);
+
+    border-radius:22px;
+
+    padding:
+        11px
+        20px;
+
+    background:
+        transparent;
+
+    color:#c6e8f5;
+
+    cursor:pointer;
+}
+
+
+.modal-submit{
+
+    border:0;
+
+    border-radius:22px;
+
+    padding:
+        11px
+        22px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #159dff,
+            #26d8ff
+        );
+
+    color:white;
+
+    font-weight:800;
+
+    cursor:pointer;
+
+    box-shadow:
+        0 7px 25px
+        rgba(0,170,255,.20);
+
+    transition:.25s;
+}
+
+
+.modal-submit:hover{
+
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 10px 30px
+        rgba(0,200,255,.32);
+}
+
+
+@media(max-width:600px){
+
+    .suggestion-modal{
+
+        padding:20px;
+
+        border-radius:20px;
+    }
+
+    .form-grid{
+
+        grid-template-columns:1fr;
+    }
+
+    .form-group.full{
+
+        grid-column:auto;
+    }
+
+    }
 </style>
 </head>
 
@@ -1482,7 +2005,242 @@ h1 span{
 
 
 </main>
+<!-- =====================================================
+     ADD SUGGESTION MODAL
+===================================================== -->
 
+<div
+    class="modal-overlay"
+    id="suggestionModal">
+
+    <div class="suggestion-modal">
+
+        <div class="modal-header">
+
+            <h2>
+                ✦ ADD <span>SUGGESTION</span>
+            </h2>
+
+            <button
+                class="close-modal"
+                onclick="closeAddSuggestion()">
+
+                ×
+
+            </button>
+
+        </div>
+
+
+        <form
+            id="suggestionForm"
+            onsubmit="submitSuggestion(event)">
+
+
+            <div class="form-grid">
+
+
+                <!-- IMAGE -->
+
+                <div class="form-group full">
+
+                    <label>
+                        Cover Image
+                    </label>
+
+                    <label
+                        class="image-upload"
+                        id="imageUpload">
+
+                        <input
+                            type="file"
+                            id="coverImage"
+                            accept="image/*"
+                            onchange="previewImage(event)">
+
+                        <div class="upload-content">
+
+                            <div class="upload-icon">
+                                ＋
+                            </div>
+
+                            <strong>
+                                Upload Cover
+                            </strong>
+
+                            <small>
+                                JPG, PNG or WEBP
+                            </small>
+
+                        </div>
+
+                        <img
+                            class="image-preview"
+                            id="imagePreview">
+
+                    </label>
+
+                </div>
+
+
+                <!-- TITLE -->
+
+                <div class="form-group full">
+
+                    <label>
+                        Title
+                    </label>
+
+                    <input
+                        type="text"
+                        id="suggestionTitle"
+                        placeholder="Enter anime, manga or manhwa title"
+                        required>
+
+                </div>
+
+
+                <!-- TYPE -->
+
+                <div class="form-group">
+
+                    <label>
+                        Type
+                    </label>
+
+                    <select
+                        id="suggestionType"
+                        required>
+
+                        <option value="">
+                            Select type
+                        </option>
+
+                        <option value="Anime">
+                            Anime
+                        </option>
+
+                        <option value="Manga">
+                            Manga
+                        </option>
+
+                        <option value="Manhwa">
+                            Manhwa
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- GENRE -->
+
+                <div class="form-group">
+
+                    <label>
+                        Genre
+                    </label>
+
+                    <input
+                        type="text"
+                        id="suggestionGenre"
+                        placeholder="Action, Romance, Fantasy...">
+
+                </div>
+
+
+                <!-- RATING -->
+
+                <div class="form-group full">
+
+                    <label>
+                        Rating
+                    </label>
+
+                    <div class="rating-input">
+
+                        <span onclick="setRating(1)">★</span>
+                        <span onclick="setRating(2)">★</span>
+                        <span onclick="setRating(3)">★</span>
+                        <span onclick="setRating(4)">★</span>
+                        <span onclick="setRating(5)">★</span>
+
+                        <span id="ratingValue">
+                            0 / 5
+                        </span>
+
+                    </div>
+
+                    <input
+                        type="hidden"
+                        id="suggestionRating"
+                        value="0">
+
+                </div>
+
+
+                <!-- DESCRIPTION -->
+
+                <div class="form-group full">
+
+                    <label>
+                        Description
+                    </label>
+
+                    <textarea
+                        id="suggestionDescription"
+                        placeholder="Tell the community why they should check this out..."></textarea>
+
+                </div>
+
+
+                <!-- LINK -->
+
+                <div class="form-group full">
+
+                    <label>
+                        Optional Link
+                    </label>
+
+                    <input
+                        type="url"
+                        id="suggestionLink"
+                        placeholder="https://...">
+
+                </div>
+
+
+            </div>
+
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    class="modal-cancel"
+                    onclick="closeAddSuggestion()">
+
+                    Cancel
+
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="modal-submit">
+
+                    ✦ Add Suggestion
+
+                </button>
+
+            </div>
+
+
+        </form>
+
+    </div>
+
+</div>
 
 <script>
 
@@ -1519,8 +2277,92 @@ function scrollToSection(id){
 
 function openAddSuggestion(){
 
+    document
+        .getElementById("suggestionModal")
+        .classList.add("active");
+
+    document.body.style.overflow="hidden";
+
+}
+
+
+function closeAddSuggestion(){
+
+    document
+        .getElementById("suggestionModal")
+        .classList.remove("active");
+
+    document.body.style.overflow="";
+
+}
+
+/* IMAGE PREVIEW */
+
+function previewImage(event){
+
+    const file =
+        event.target.files[0];
+
+    if(!file) return;
+
+    const preview =
+        document.getElementById("imagePreview");
+
+    const upload =
+        document.getElementById("imageUpload");
+
+    preview.src =
+        URL.createObjectURL(file);
+
+    upload.classList.add("has-image");
+
+}
+
+
+/* RATING */
+
+let selectedRating = 0;
+
+
+function setRating(value){
+
+    selectedRating = value;
+
+    document
+        .getElementById("suggestionRating")
+        .value = value;
+
+    document
+        .getElementById("ratingValue")
+        .textContent = value + " / 5";
+
+
+    document
+        .querySelectorAll(".rating-input span")
+        .forEach((star,index)=>{
+
+            if(index < 5){
+
+                star.classList.toggle(
+                    "active",
+                    index < value
+                );
+
+            }
+
+        });
+
+}
+
+
+/* FORM */
+
+function submitSuggestion(event){
+
+    event.preventDefault();
+
     alert(
-        "The Add Suggestion form will be connected to Supabase next. ✨"
+        "Form received! ✨ Next we will connect this form to Supabase."
     );
 
 }
