@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>NEXUS</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="background">
+        <div class="orb orb1"></div>
+        <div class="orb orb2"></div>
+        <div class="grid"></div>
+    </div>
+
+    <header>
+        <div class="logo">
+            NEXUS<span>.</span>
+        </div>
+
+        <div class="status">
+            <span></span> SYSTEM ONLINE
+        </div>
+    </header>
+
+
+    <main>
+
+        <section class="hero">
+
+            <p class="welcome">WELCOME TO</p>
+
+            <h1>
+                YOUR DIGITAL
+                <span>SPACE.</span>
+            </h1>
+
+            <p class="description">
+                Notes. Conversations. Anime. Media.
+                Everything connected in one private space.
+            </p>
+
+            <div class="buttons">
+                <button class="primary" onclick="openLogin()">
+                    ENTER NEXUS
+                </button>
+
+                <button class="secondary" onclick="explore()">
+                    EXPLORE
+                </button>
+            </div>
+
+        </section>
+
+
+        <section class="features">
+
+            <div class="feature">
+                <div class="icon">✦</div>
+                <h3>TEXT VAULT</h3>
+                <p>Save, edit and synchronize your notes.</p>
+            </div>
+
+            <div class="feature">
+                <div class="icon">◈</div>
+                <h3>PRIVATE CHAT</h3>
+                <p>Talk privately with other NEXUS users.</p>
+            </div>
+
+            <div class="feature">
+                <div class="icon">◇</div>
+                <h3>ANIME HUB</h3>
+                <p>Build a shared anime and manga collection.</p>
+            </div>
+
+            <div class="feature">
+                <div class="icon">⬡</div>
+                <h3>MEDIA LAB</h3>
+                <p>Convert supported media through the converter.</p>
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <div id="loginPanel" class="login-panel">
+
+        <div class="login-box">
+
+            <button class="close" onclick="closeLogin()">×</button>
+
+            <p class="welcome">NEXUS ACCOUNT</p>
+
+            <h2>ENTER THE <span>SPACE</span></h2>
+
+            <input type="email" placeholder="Email address">
+
+            <input type="password" placeholder="Password">
+
+            <button class="primary login-button">
+                LOGIN
+            </button>
+
+            <p class="register">
+                Don't have an account?
+                <a href="#">Create one</a>
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <script src="script.js"></script>
+
+</body>
+</html>
