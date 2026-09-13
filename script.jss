@@ -2,8 +2,8 @@
 // NEXUS SUPABASE
 // =====================================
 
-const SUPABASE_URL = "YOUR_SUPABASE_PROJECT_URL";
-const SUPABASE_KEY = "YOUR_SUPABASE_PUBLISHABLE_KEY";
+const SUPABASE_URL = "https://zgeswrhyhxgwcgcgnsti.supabase.co";
+const SUPABASE_KEY = "sb_publishable_GX9S4EVFF4Lf_BRMETV80g_oEavE6Up";
 
 const supabaseClient = window.supabase.createClient(
     SUPABASE_URL,
