@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>NEXUS — Text Vault</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+
+        .vault-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .vault-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .vault-title h1 {
+            margin: 0;
+        }
+
+        .vault-title p {
+            opacity: .7;
+        }
+
+        .vault-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .notes-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 20px;
+        }
+
+        .notes-list,
+        .editor {
+            background: rgba(255,255,255,.04);
+            border: 1px solid rgba(255,255,255,.1);
+            border-radius: 18px;
+            padding: 20px;
+            backdrop-filter: blur(15px);
+        }
+
+        .notes-list {
+            min-height: 500px;
+        }
+
+        .search-box {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,.15);
+            background: rgba(0,0,0,.25);
+            color: white;
+        }
+
+        .note-item {
+            padding: 14px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            background: rgba(255,255,255,.04);
+            border: 1px solid transparent;
+        }
+
+        .note-item:hover {
+            border-color: rgba(255,255,255,.2);
+        }
+
+        .note-item.active {
+            border-color: rgba(255,255,255,.4);
+        }
+
+        .note-item strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .note-item small {
+            opacity: .5;
+        }
+
+        .editor input,
+        .editor textarea {
+            width: 100%;
+            box-sizing: border-box;
+            background: rgba(0,0,0,.25);
+            color: white;
+            border: 1px solid rgba(255,255,255,.15);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 15px;
+            font-family: inherit;
+        }
+
+        .editor input {
+            font-size: 20px;
+        }
+
+        .editor textarea {
+            min-height: 380px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        .editor-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .danger {
+            background: rgba(255,60,60,.15);
+            border: 1px solid rgba(255,60,60,.3);
+            color: #ff7777;
+        }
+
+        .empty {
+            text-align: center;
+            opacity: .5;
+            padding: 40px 10px;
+        }
+
+        @media (max-width: 700px) {
+
+            .notes-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .notes-list {
+                min-height: auto;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<header>
+
+    <div class="logo">
+        NEXUS<span>.</span>
+    </div>
+
+    <button class="secondary"
+            onclick="goBack()">
+        ← BACK
+    </button>
+
+</header>
+
+
+<main>
+
+    <div class="vault-container">
+
+        <div class="vault-header">
+
+            <div class="vault-title">
+
+                <p class="welcome">
+                    N-TEXT VAULT
+                </p>
+
+                <h1>
+                    YOUR <span>NOTES.</span>
+                </h1>
+
+                <p>
+                    Synchronized across your devices.
+                </p>
+
+            </div>
+
+            <div class="vault-actions">
+
+                <button class="primary"
+                        onclick="createNote()">
+                    + NEW NOTE
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <section class="notes-layout">
+
+
+            <!-- NOTES LIST -->
+
+            <div class="notes-list">
+
+                <input
+                    type="text"
+                    id="searchNotes"
+                    class="search-box"
+                    placeholder="Search notes..."
+                    oninput="searchNotes()"
+                >
+
+                <div id="notesList">
+
+                    <div class="empty">
+                        No notes yet.
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- EDITOR -->
+
+            <div class="editor">
+
+                <input
+                    type="text"
+                    id="noteTitle"
+                    placeholder="Note title"
+                >
+
+                <textarea
+                    id="noteContent"
+                    placeholder="Write your note here..."
+                ></textarea>
+
+
+                <div class="editor-actions">
+
+                    <button class="primary"
+                            onclick="saveNote()">
+                        💾 SAVE
+                    </button>
+
+                    <button class="secondary"
+                            onclick="clearEditor()">
+                        CLEAR
+                    </button>
+
+                    <button class="danger"
+                            onclick="deleteNote()">
+                        🗑 DELETE
+                    </button>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+    </div>
+
+</main>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+<script>
+
+const SUPABASE_URL =
+    "https://zgeswrhyhxgwcgcgnsti.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_GX9S4EVFF4Lf_BRMETV80g_oEavE6Up";
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+let currentUser = null;
+let currentNoteId = null;
+let allNotes = [];
+
+
+/* =========================
+   CHECK LOGIN
+========================= */
+
+async function checkUser() {
+
+    const {
+        data: { user }
+    } = await supabaseClient.auth.getUser();
+
+    if (!user) {
+
+        window.location.href = "index.html";
+
+        return;
+
+    }
+
+    currentUser = user;
+
+    await loadNotes();
+
+}
+
+
+/* =========================
+   LOAD NOTES
+========================= */
+
+async function loadNotes() {
+
+    const { data, error } =
+        await supabaseClient
+        .from("notes")
+        .select("*")
+        .eq("user_id", currentUser.id)
+        .order("updated_at", {
+            ascending: false
+        });
+
+
+    if (error) {
+
+        alert(error.message);
+
+        return;
+
+    }
+
+
+    allNotes = data || [];
+
+    displayNotes(allNotes);
+
+}
+
+
+/* =========================
+   DISPLAY NOTES
+========================= */
+
+function displayNotes(notes) {
+
+    const list =
+        document.getElementById("notesList");
+
+
+    if (!notes.length) {
+
+        list.innerHTML = `
+            <div class="empty">
+                No notes found.
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    list.innerHTML = "";
+
+
+    notes.forEach(note => {
+
+        const item =
+            document.createElement("div");
+
+        item.className = "note-item";
+
+        if (note.id === currentNoteId) {
+
+            item.classList.add("active");
+
+        }
+
+
+        item.innerHTML = `
+
+            <strong>
+                ${escapeHTML(note.title)}
+            </strong>
+
+            <small>
+                ${new Date(note.updated_at)
+                    .toLocaleString()}
+            </small>
+
+        `;
+
+
+        item.onclick = () =>
+            openNote(note.id);
+
+
+        list.appendChild(item);
+
+    });
+
+}
+
+
+/* =========================
+   CREATE NOTE
+========================= */
+
+async function createNote() {
+
+    const { data, error } =
+        await supabaseClient
+        .from("notes")
+        .insert({
+
+            user_id: currentUser.id,
+
+            title: "Untitled Note",
+
+            content: ""
+
+        })
+        .select()
+        .single();
+
+
+    if (error) {
+
+        alert(error.message);
+
+        return;
+
+    }
+
+
+    allNotes.unshift(data);
+
+    currentNoteId = data.id;
+
+    document.getElementById("noteTitle").value =
+        data.title;
+
+    document.getElementById("noteContent").value =
+        data.content;
+
+
+    displayNotes(allNotes);
+
+}
+
+
+/* =========================
+   OPEN NOTE
+========================= */
+
+function openNote(id) {
+
+    const note =
+        allNotes.find(n => n.id === id);
+
+
+    if (!note) return;
+
+
+    currentNoteId = id;
+
+
+    document.getElementById("noteTitle").value =
+        note.title;
+
+    document.getElementById("noteContent").value =
+        note.content;
+
+
+    displayNotes(allNotes);
+
+}
+
+
+/* =========================
+   SAVE NOTE
+========================= */
+
+async function saveNote() {
+
+    if (!currentNoteId) {
+
+        alert("Create or select a note first.");
+
+        return;
+
+    }
+
+
+    const title =
+        document.getElementById("noteTitle")
+        .value
+        .trim() || "Untitled Note";
+
+
+    const content =
+        document.getElementById("noteContent")
+        .value;
+
+
+    const { data, error } =
+        await supabaseClient
+        .from("notes")
+        .update({
+
+            title: title,
+
+            content: content,
+
+            updated_at: new Date().toISOString()
+
+        })
+        .eq("id", currentNoteId)
+        .eq("user_id", currentUser.id)
+        .select()
+        .single();
+
+
+    if (error) {
+
+        alert(error.message);
+
+        return;
+
+    }
+
+
+    const index =
+        allNotes.findIndex(
+            n => n.id === currentNoteId
+        );
+
+
+    if (index !== -1) {
+
+        allNotes[index] = data;
+
+    }
+
+
+    displayNotes(allNotes);
+
+    alert("Note saved successfully!");
+
+
+}
+
+
+/* =========================
+   DELETE NOTE
+========================= */
+
+async function deleteNote() {
+
+    if (!currentNoteId) {
+
+        alert("Select a note first.");
+
+        return;
+
+    }
+
+
+    const confirmDelete =
+        confirm("Delete this note?");
+
+
+    if (!confirmDelete) return;
+
+
+    const { error } =
+        await supabaseClient
+        .from("notes")
+        .delete()
+        .eq("id", currentNoteId)
+        .eq("user_id", currentUser.id);
+
+
+    if (error) {
+
+        alert(error.message);
+
+        return;
+
+    }
+
+
+    allNotes =
+        allNotes.filter(
+            n => n.id !== currentNoteId
+        );
+
+
+    currentNoteId = null;
+
+
+    clearEditor();
+
+    displayNotes(allNotes);
+
+}
+
+
+/* =========================
+   SEARCH
+========================= */
+
+function searchNotes() {
+
+    const query =
+        document.getElementById("searchNotes")
+        .value
+        .toLowerCase();
+
+
+    const filtered =
+        allNotes.filter(note =>
+
+            note.title
+                .toLowerCase()
+                .includes(query)
+
+            ||
+
+            note.content
+                .toLowerCase()
+                .includes(query)
+
+        );
+
+
+    displayNotes(filtered);
+
+}
+
+
+/* =========================
+   CLEAR EDITOR
+========================= */
+
+function clearEditor() {
+
+    currentNoteId = null;
+
+    document.getElementById("noteTitle").value = "";
+
+    document.getElementById("noteContent").value = "";
+
+    displayNotes(allNotes);
+
+}
+
+
+/* =========================
+   BACK
+========================= */
+
+function goBack() {
+
+    window.location.href =
+        "dashboard.html";
+
+}
+
+
+/* =========================
+   HTML SECURITY
+========================= */
+
+function escapeHTML(text) {
+
+    return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+/* =========================
+   START
+========================= */
+
+checkUser();
+
+</script>
+
+</body>
+
+</html>
