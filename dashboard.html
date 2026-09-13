@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>NEXUS Dashboard</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+
+<body>
+
+    <header>
+
+        <div class="logo">
+            NEXUS<span>.</span>
+        </div>
+
+        <button
+            class="secondary"
+            onclick="logout()"
+        >
+            LOGOUT
+        </button>
+
+    </header>
+
+
+    <main>
+
+        <section class="hero">
+
+            <p class="welcome">
+                NEXUS SYSTEM
+            </p>
+
+            <h1>
+                WELCOME
+                <span>BACK.</span>
+            </h1>
+
+            <p class="description">
+                Your personal digital space is ready.
+            </p>
+
+        </section>
+
+
+        <section class="features">
+
+            <div class="feature">
+                <div class="icon">✦</div>
+                <h3>TEXT VAULT</h3>
+                <p>Your synchronized notes.</p>
+            </div>
+
+            <div class="feature">
+                <div class="icon">◈</div>
+                <h3>PRIVATE CHAT</h3>
+                <p>Your private conversations.</p>
+            </div>
+
+            <div class="feature">
+                <div class="icon">◇</div>
+                <h3>ANIME HUB</h3>
+                <p>Shared anime and manga collection.</p>
+            </div>
+
+            <div class="feature">
+                <div class="icon">⬡</div>
+                <h3>MEDIA LAB</h3>
+                <p>Your media conversion tools.</p>
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+
+        const SUPABASE_URL =
+            "YOUR_SUPABASE_PROJECT_URL";
+
+        const SUPABASE_KEY =
+            "YOUR_SUPABASE_PUBLISHABLE_KEY";
+
+        const supabaseClient =
+            window.supabase.createClient(
+                SUPABASE_URL,
+                SUPABASE_KEY
+            );
+
+
+        async function checkUser() {
+
+            const {
+                data: { user }
+            } = await supabaseClient.auth.getUser();
+
+
+            if (!user) {
+
+                window.location.href = "index.html";
+
+                return;
+            }
+
+        }
+
+
+        async function logout() {
+
+            await supabaseClient.auth.signOut();
+
+            window.location.href = "index.html";
+
+        }
+
+
+        checkUser();
+
+    </script>
+
+</body>
+
+</html>
