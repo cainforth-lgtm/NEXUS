@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>NEXUS — Private Chat</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#05070d;color:#fff;font-family:Arial,Helvetica,sans-serif;min-height:100vh;overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;background:radial-gradient(circle at 20% 20%,rgba(0,210,255,.13),transparent 32%),radial-gradient(circle at 80% 70%,rgba(120,70,255,.12),transparent 35%);pointer-events:none}
+header{height:70px;padding:0 5%;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.08);position:relative;z-index:5;background:rgba(5,7,13,.72);backdrop-filter:blur(14px)}
+.logo{font-size:25px;font-weight:800;letter-spacing:4px}.logo span{opacity:.45}
+button,input{font:inherit}
+button{cursor:pointer}
+.secondary,.new-chat,.mobile-users{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#fff;border-radius:11px;padding:10px 14px}
+.secondary:hover,.new-chat:hover,.mobile-users:hover{background:rgba(255,255,255,.12)}
+.page{width:min(1200px,94%);margin:0 auto;padding:45px 0}
+.heading{margin-bottom:25px}.welcome{font-size:12px;letter-spacing:3px;opacity:.5}.heading h1{font-size:42px;margin:8px 0}.heading h1 span{opacity:.42}.heading p{opacity:.55}
+.chat-window{height:680px;display:grid;grid-template-columns:310px 1fr;border:1px solid rgba(255,255,255,.1);border-radius:20px;overflow:hidden;background:rgba(255,255,255,.035);backdrop-filter:blur(18px);box-shadow:0 25px 80px rgba(0,0,0,.35)}
+.users-panel{border-right:1px solid rgba(255,255,255,.08);padding:18px;min-width:0}
+.users-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}
+.users-title h3{margin:0;letter-spacing:2px;font-size:13px}.status-dot{width:8px;height:8px;border-radius:50%;background:#69ffb0;box-shadow:0 0 12px #69ffb0}
+.new-chat{width:100%;margin-bottom:10px}
+.search-row{display:flex;gap:7px}.user-search{flex:1;min-width:0;padding:12px;border-radius:11px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.25);color:#fff;outline:none}.user-search:focus{border-color:rgba(255,255,255,.4)}
+.search-btn{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.08);color:#fff;border-radius:11px;padding:0 13px}
+.search-btn:active{transform:scale(.96)}
+.users-list{height:calc(100% - 142px);overflow-y:auto;margin-top:13px}
+.user-item{padding:13px;border-radius:12px;margin-bottom:7px;border:1px solid transparent;cursor:pointer;transition:.2s}
+.user-item:hover,.user-item.active{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.12);transform:translateX(3px)}
+.user-name{font-weight:700}.user-handle{font-size:12px;opacity:.45;margin-top:4px}
+.empty{height:100%;display:flex;align-items:center;justify-content:center;text-align:center;opacity:.48;padding:20px;line-height:1.6}
+.chat-area{display:flex;flex-direction:column;min-width:0}
+.chat-header{min-height:76px;padding:13px 18px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:space-between}
+.person{display:flex;align-items:center;gap:12px}.avatar{width:43px;height:43px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.13);font-weight:800}
+.name{font-weight:700}.status{font-size:12px;opacity:.45;margin-top:3px}.mobile-users{display:none}
+.messages{flex:1;overflow-y:auto;padding:22px;display:flex;flex-direction:column;gap:9px}
+.message{max-width:76%;padding:11px 14px;border-radius:15px;line-height:1.45;word-break:break-word;animation:in .2s ease}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.sent{align-self:flex-end;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.1);border-bottom-right-radius:4px}
+.received{align-self:flex-start;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.08);border-bottom-left-radius:4px}
+.time{font-size:10px;opacity:.38;display:block;margin-top:4px}.del{border:0;background:none;color:#fff;opacity:.35;font-size:10px;padding:0;margin-top:3px}.del:hover{opacity:.8}
+.input-area{padding:14px;border-top:1px solid rgba(255,255,255,.08);display:flex;gap:8px}.message-input{flex:1;min-width:0;padding:13px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.25);color:#fff;outline:none}.send{width:50px;border:0;border-radius:12px;background:rgba(255,255,255,.1);color:#fff;font-size:18px}
+.overlay{display:none;pointer-events:none}
+@media(max-width:800px){
+ .page{padding:25px 0}.heading h1{font-size:32px}.chat-window{height:calc(100vh - 155px);min-height:520px;grid-template-columns:1fr}
+ .users-panel{position:fixed;z-index:20;left:0;top:0;bottom:0;width:min(330px,88vw);background:#080b13;transform:translateX(-105%);transition:.25s;box-shadow:20px 0 50px rgba(0,0,0,.5)}
+ .users-panel.open{transform:translateX(0)}.mobile-users{display:block}.overlay.open{display:block;position:fixed;z-index:19;inset:0;background:rgba(0,0,0,.6);pointer-events:auto}
+ .users-list{height:calc(100% - 142px)}.message{max-width:86%}
+}
+
+/* ===== NEXUS SLEEK MOTION PACK ===== */
+body {
+  animation: nexusPageIn .7s cubic-bezier(.2,.8,.2,1) both;
+}
+
+body:after {
+  content:"";
+  position:fixed;
+  width:42vw;
+  height:42vw;
+  max-width:520px;
+  max-height:520px;
+  min-width:220px;
+  min-height:220px;
+  right:-14vw;
+  top:18vh;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(0,210,255,.10), transparent 68%);
+  filter:blur(10px);
+  pointer-events:none;
+  z-index:-1;
+  animation:nexusFloat 9s ease-in-out infinite alternate;
+}
+
+.heading {
+  animation:nexusHeading .8s .08s cubic-bezier(.2,.8,.2,1) both;
+}
+
+.heading h1 {
+  position:relative;
+  overflow:hidden;
+}
+
+.heading h1:after {
+  content:"";
+  position:absolute;
+  left:-30%;
+  top:0;
+  width:25%;
+  height:100%;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,.22), transparent);
+  transform:skewX(-20deg);
+  animation:nexusSweep 3.8s 1.1s ease-in-out infinite;
+}
+
+.chat-window {
+  position:relative;
+  isolation:isolate;
+  animation:nexusPanel .85s .18s cubic-bezier(.2,.8,.2,1) both;
+  transition:transform .35s ease, box-shadow .35s ease, border-color .35s ease;
+}
+
+.chat-window:hover {
+  transform:translateY(-2px);
+  border-color:rgba(255,255,255,.15);
+  box-shadow:0 30px 90px rgba(0,0,0,.42);
+}
+
+.chat-window:before {
+  content:"";
+  position:absolute;
+  inset:-1px;
+  border-radius:20px;
+  padding:1px;
+  background:linear-gradient(120deg, rgba(0,210,255,.28), transparent 35%, rgba(140,80,255,.20), transparent 70%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+  mask-composite:exclude;
+  pointer-events:none;
+  z-index:5;
+  opacity:.45;
+  animation:nexusBorder 6s linear infinite;
+}
+
+.users-title h3 {
+  animation:nexusSoftIn .7s .45s both;
+}
+
+.status-dot {
+  animation:nexusPulse 2s ease-in-out infinite;
+}
+
+.new-chat,
+.search-btn,
+.secondary,
+.mobile-users,
+.send {
+  transition:transform .2s ease, background .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+
+.new-chat:hover,
+.search-btn:hover,
+.secondary:hover,
+.mobile-users:hover {
+  transform:translateY(-2px);
+  box-shadow:0 8px 24px rgba(0,0,0,.22);
+}
+
+.new-chat:active,
+.search-btn:active,
+.secondary:active,
+.mobile-users:active,
+.send:active {
+  transform:scale(.96);
+}
+
+.user-search {
+  transition:box-shadow .25s ease, border-color .25s ease, transform .25s ease;
+}
+
+.user-search:focus {
+  transform:translateY(-1px);
+  box-shadow:0 0 0 3px rgba(0,210,255,.06), 0 8px 25px rgba(0,0,0,.2);
+}
+
+.user-item {
+  opacity:0;
+  transform:translateX(-12px);
+  animation:nexusUserIn .45s cubic-bezier(.2,.8,.2,1) forwards;
+}
+
+.user-item:nth-child(1){animation-delay:.03s}
+.user-item:nth-child(2){animation-delay:.08s}
+.user-item:nth-child(3){animation-delay:.13s}
+.user-item:nth-child(4){animation-delay:.18s}
+.user-item:nth-child(5){animation-delay:.23s}
+.user-item:nth-child(6){animation-delay:.28s}
+.user-item:nth-child(7){animation-delay:.33s}
+.user-item:nth-child(8){animation-delay:.38s}
+.user-item:nth-child(9){animation-delay:.43s}
+.user-item:nth-child(10){animation-delay:.48s}
+
+.user-item:hover {
+  box-shadow:inset 3px 0 0 rgba(0,210,255,.45), 0 8px 22px rgba(0,0,0,.15);
+}
+
+.user-item.active {
+  box-shadow:inset 3px 0 0 rgba(0,210,255,.65);
+}
+
+.chat-header {
+  transition:background .35s ease;
+}
+
+.chat-header:has(.name:not(:empty)) {
+  background:linear-gradient(90deg, rgba(255,255,255,.025), transparent);
+}
+
+.avatar {
+  transition:transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease;
+}
+
+.avatar:hover {
+  transform:rotate(-4deg) scale(1.06);
+  box-shadow:0 0 24px rgba(0,210,255,.12);
+}
+
+.message {
+  animation:nexusMessage .38s cubic-bezier(.2,.8,.2,1) both;
+}
+
+.send:hover {
+  transform:translateY(-2px);
+  box-shadow:0 8px 22px rgba(255,255,255,.08);
+}
+
+.message-input {
+  transition:border-color .25s ease, box-shadow .25s ease;
+}
+
+.message-input:focus {
+  border-color:rgba(0,210,255,.32);
+  box-shadow:0 0 0 3px rgba(0,210,255,.045);
+}
+
+.overlay {
+  transition:opacity .25s ease;
+  opacity:0;
+}
+
+.overlay.open {
+  opacity:1;
+}
+
+@media(max-width:800px){
+  .users-panel {
+    transition:transform .38s cubic-bezier(.22,.9,.25,1), box-shadow .38s ease;
+  }
+
+  .users-panel.open {
+    box-shadow:20px 0 70px rgba(0,0,0,.62), 0 0 35px rgba(0,210,255,.035);
+  }
+
+  .chat-window:hover {
+    transform:none;
+  }
+}
+
+@keyframes nexusPageIn {
+  from {opacity:0}
+  to {opacity:1}
+}
+
+@keyframes nexusHeading {
+  from {opacity:0; transform:translateY(18px)}
+  to {opacity:1; transform:translateY(0)}
+}
+
+@keyframes nexusPanel {
+  from {opacity:0; transform:translateY(22px) scale(.985)}
+  to {opacity:1; transform:translateY(0) scale(1)}
+}
+
+@keyframes nexusSoftIn {
+  from {opacity:0; transform:translateX(-8px)}
+  to {opacity:1; transform:translateX(0)}
+}
+
+@keyframes nexusUserIn {
+  to {opacity:1; transform:translateX(0)}
+}
+
+@keyframes nexusMessage {
+  from {opacity:0; transform:translateY(10px) scale(.985)}
+  to {opacity:1; transform:translateY(0) scale(1)}
+}
+
+@keyframes nexusPulse {
+  0%,100% {transform:scale(1); box-shadow:0 0 10px #69ffb0}
+  50% {transform:scale(1.35); box-shadow:0 0 22px #69ffb0}
+}
+
+@keyframes nexusFloat {
+  from {transform:translate3d(0,0,0) scale(1)}
+  to {transform:translate3d(-35px,22px,0) scale(1.08)}
+}
+
+@keyframes nexusSweep {
+  0%,58% {left:-30%}
+  78%,100% {left:120%}
+}
+
+@keyframes nexusBorder {
+  from {filter:hue-rotate(0deg)}
+  to {filter:hue-rotate(360deg)}
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *:before, *:after {
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+    scroll-behavior:auto !important;
+    transition-duration:.01ms !important;
+  }
+}
+
+</style>
+</head>
+<body>
+<header><div class="logo">NEXUS<span>.</span></div><button class="secondary" onclick="goBack()">← BACK</button></header>
+
+<main class="page">
+<section class="heading">
+<div class="welcome">NEXUS COMMUNICATION</div>
+<h1>PRIVATE <span>CHAT.</span></h1>
+<p>Find any registered NEXUS user and start a private conversation.</p>
+</section>
+
+<section class="chat-window">
+<div id="overlay" class="overlay" onclick="closeUsers()"></div>
+<aside id="usersPanel" class="users-panel">
+<div class="users-title"><h3>NEXUS USERS</h3><div class="status-dot"></div></div>
+<button class="new-chat" onclick="loadUsers()">↻ LOAD ALL USERS</button>
+<div class="search-row">
+<input id="userSearch" class="user-search" placeholder="Search username..." onkeydown="if(event.key==='Enter')searchUsers()">
+<button class="search-btn" onclick="searchUsers()">SEARCH</button>
+</div>
+<div id="usersList" class="users-list"><div class="empty">Loading registered users…</div></div>
+</aside>
+
+<section class="chat-area">
+<div class="chat-header">
+<div class="person"><div id="chatAvatar" class="avatar">?</div><div><div id="chatName" class="name">Select a user</div><div id="chatStatus" class="status">Choose a NEXUS user to begin</div></div></div>
+<button class="mobile-users" onclick="openUsers()">👥 USERS</button>
+</div>
+<div id="messages" class="messages"><div class="empty">◈<br>Select a NEXUS user to begin chatting.</div></div>
+<div class="input-area"><input id="messageInput" class="message-input" disabled placeholder="Select a user first…" onkeydown="handleEnter(event)"><button id="sendButton" class="send" disabled onclick="sendMessage()">➤</button></div>
+</section>
+</section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL="https://zgeswrhyhxgwcgcgnsti.supabase.co";
+const SUPABASE_KEY="YOUR_SUPABASE_PUBLISHABLE_KEY";
+const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+let currentUser=null,selectedUser=null,currentConversation=null,realtimeChannel=null;
+
+function escapeHTML(v){return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}
+function initials(u){return (u.display_name||u.username||"U").trim().slice(0,1).toUpperCase()}
+function goBack(){location.href="dashboard.html"}
+function openUsers(){document.getElementById("usersPanel").classList.add("open");document.getElementById("overlay").classList.add("open")}
+function closeUsers(){document.getElementById("usersPanel").classList.remove("open");document.getElementById("overlay").classList.remove("open")}
+
+async function checkUser(){
+ const {data,error}=await supabaseClient.auth.getUser();
+ if(error||!data.user){location.href="index.html";return}
+ currentUser=data.user;
+ await loadUsers();
+}
+async function loadUsers(){
+ if(!currentUser)return;
+ const list=document.getElementById("usersList");
+ list.innerHTML='<div class="empty">Loading registered users…</div>';
+ const {data,error}=await supabaseClient.from("profiles").select("id,username,display_name,avatar_url").neq("id",currentUser.id).order("display_name",{ascending:true});
+ if(error){
+   console.error(error);
+   list.innerHTML='<div class="empty">Could not load users.<br><br>'+escapeHTML(error.message)+'</div>';
+   return;
+ }
+ renderUsers(data||[]);
+}
+async function searchUsers(){
+ const q=document.getElementById("userSearch").value.trim();
+ if(!q){await loadUsers();return}
+ const list=document.getElementById("usersList");
+ list.innerHTML='<div class="empty">Searching…</div>';
+ const safe=q.replace(/[%_,]/g,m=>"\\"+m);
+ const {data,error}=await supabaseClient.from("profiles").select("id,username,display_name,avatar_url").neq("id",currentUser.id).or("username.ilike.%"+safe+"%,display_name.ilike.%"+safe+"%").limit(50);
+ if(error){console.error(error);list.innerHTML='<div class="empty">Search error:<br>'+escapeHTML(error.message)+'</div>';return}
+ renderUsers(data||[]);
+}
+function renderUsers(users){
+ const list=document.getElementById("usersList");
+ if(!users.length){list.innerHTML='<div class="empty">No other registered NEXUS users found.</div>';return}
+ list.innerHTML="";
+ users.forEach(u=>{
+  const item=document.createElement("div");item.className="user-item"+(selectedUser?.id===u.id?" active":"");
+  item.innerHTML='<div class="user-name">'+escapeHTML(u.display_name||u.username||"User")+'</div><div class="user-handle">@'+escapeHTML(u.username||"user")+'</div>';
+  item.onclick=()=>selectUser(u,item);list.appendChild(item);
+ });
+}
+async function selectUser(user,item){
+ selectedUser=user;
+ document.querySelectorAll(".user-item").forEach(x=>x.classList.remove("active"));
+ item?.classList.add("active");
+ document.getElementById("chatAvatar").textContent=initials(user);
+ document.getElementById("chatName").textContent=user.display_name||user.username||"User";
+ document.getElementById("chatStatus").textContent="@"+(user.username||"user");
+ document.getElementById("messageInput").disabled=false;document.getElementById("sendButton").disabled=false;
+ document.getElementById("messageInput").placeholder="Write a message…";
+ closeUsers();await getOrCreateConversation();await loadMessages();
+}
+async function getOrCreateConversation(){
+ const a=currentUser.id,b=selectedUser.id;
+ const {data:existing,error:e}=await supabaseClient.from("conversations").select("*").or("and(user_one.eq."+a+",user_two.eq."+b+"),and(user_one.eq."+b+",user_two.eq."+a+")").limit(1);
+ if(e)throwError(e);
+ if(existing?.length){currentConversation=existing[0];return}
+ const {data,error}=await supabaseClient.from("conversations").insert({user_one:a,user_two:b}).select().single();
+ if(error){
+  const {data:again}=await supabaseClient.from("conversations").select("*").or("and(user_one.eq."+a+",user_two.eq."+b+"),and(user_one.eq."+b+",user_two.eq."+a+")").limit(1);
+  if(again?.length){currentConversation=again[0];return}
+  throwError(error);
+ }
+ currentConversation=data;
+}
+function throwError(e){console.error(e);alert(e.message);throw e}
+async function loadMessages(){
+ const box=document.getElementById("messages");box.innerHTML="";
+ const {data,error}=await supabaseClient.from("messages").select("*").eq("conversation_id",currentConversation.id).order("created_at",{ascending:true});
+ if(error){box.innerHTML='<div class="empty">'+escapeHTML(error.message)+'</div>';return}
+ if(!data?.length){box.innerHTML='<div class="empty">No messages yet. Say hello 👋</div>'}
+ else data.forEach(renderMessage);
+ box.scrollTop=box.scrollHeight;subscribeToMessages();
+}
+function renderMessage(m){
+ const box=document.getElementById("messages");const empty=box.querySelector(".empty");if(empty)empty.remove();
+ const sent=m.sender_id===currentUser.id;const el=document.createElement("div");el.className="message "+(sent?"sent":"received");el.dataset.id=m.id;
+ el.innerHTML='<div>'+escapeHTML(m.content)+'</div><span class="time">'+new Date(m.created_at).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})+'</span>'+(sent?'<button class="del" onclick="deleteMessage(\''+m.id+'\')">Delete</button>':"");
+ box.appendChild(el);box.scrollTop=box.scrollHeight;
+}
+async function sendMessage(){
+ if(!currentConversation)return;
+ const input=document.getElementById("messageInput"),content=input.value.trim();
+ if(!content)return;
+
+ // Show the sent message immediately using the row returned by Supabase.
+ // This means the sender does not have to refresh the page to see it.
+ input.value="";
+ const {data,error}=await supabaseClient
+   .from("messages")
+   .insert({conversation_id:currentConversation.id,sender_id:currentUser.id,content})
+   .select("*")
+   .single();
+
+ if(error){
+   console.error(error);
+   alert(error.message);
+   input.value=content;
+   return;
+ }
+
+ if(data && !document.querySelector('[data-id="'+data.id+'"]')){
+   renderMessage(data);
+ }
+}
+async function deleteMessage(id){
+ const {error}=await supabaseClient.from("messages").delete().eq("id",id).eq("sender_id",currentUser.id);
+ if(error){alert(error.message);return}document.querySelector('[data-id="'+id+'"]')?.remove();
+}
+function subscribeToMessages(){
+ if(realtimeChannel)supabaseClient.removeChannel(realtimeChannel);
+ realtimeChannel=supabaseClient.channel("nexus-chat-"+currentConversation.id).on("postgres_changes",{event:"INSERT",schema:"public",table:"messages",filter:"conversation_id=eq."+currentConversation.id},p=>{if(!document.querySelector('[data-id="'+p.new.id+'"]'))renderMessage(p.new)}).on("postgres_changes",{event:"DELETE",schema:"public",table:"messages"},p=>{document.querySelector('[data-id="'+p.old.id+'"]')?.remove()}).subscribe();
+}
+function handleEnter(e){if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMessage()}}
+checkUser();
+</script>
+</body>
+</html>
